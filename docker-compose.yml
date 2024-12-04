@@ -1,0 +1,43 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: mydatabase
+    networks:
+      - my_overlay_network
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+      resources:
+        limits:
+          memory: 512M
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  webapp:
+    image: nginx:latest
+    ports:
+      - "8080:80"
+    networks:
+      - my_overlay_network
+    deploy:
+      replicas: 3
+
+  redis:
+    image: redis:latest
+    networks:
+      - my_overlay_network
+    deploy:
+      replicas: 2
+
+networks:
+  my_overlay_network:
+    external: true
+
+volumes:
+  postgres_data:
